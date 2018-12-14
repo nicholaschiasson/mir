@@ -1,0 +1,10 @@
+[package]
+name = "mir"
+version = "0.1.0"
+authors = ["Nicholas Omer Chiasson <nicholasomerchiasson@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+gitlab = "0.1104.0"
+rpassword = "2.1.0"
+structopt = "0.2.10"
