@@ -69,8 +69,9 @@ test:cargo:
   image: rust:1.31.0
   script:
     - *version_stamp
+    - for ENV_VAR in ${ENV[@]}; do export ${ENV_VAR}; done
     - rustup target add ${TARGET}
-    - ${ENV} cargo build --release --target ${TARGET} ${FLAGS}
+    - cargo build --release --target ${TARGET} ${FLAGS}
   artifacts:
     paths:
       - target/${TARGET}/release
