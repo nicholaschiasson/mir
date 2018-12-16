@@ -67,7 +67,7 @@ version:master:
     - apt-get update -yqq
     - apt-get install -yqq --no-install-recommends build-essential musl-tools libssl-dev
     - tar xzf <(curl https://static.rust-lang.org/dist/rust-1.30.0-${TARGET}.tar.gz -sSfL)
-    - ./rust-${TARGET}/install.sh
+    - ./rust-1.30.0-${TARGET}/install.sh
     - sed -E "s/(version = )\"0.0.0\"/\1\"$(cat VERSION_FILE)\"/" -i.bak Cargo.toml
     - export PKG_CONFIG_ALLOW_CROSS=1
     - for ENV_VAR in ${ENV[@]}; do export ${ENV_VAR}; done
