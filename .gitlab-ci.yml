@@ -77,7 +77,7 @@ version:master:
 build:linux:
   <<: *build_template
   script:
-    - apt-get update && apt-get install -y musl-tools
+    - apt-get update && apt-get install -y musl-tools libssl-dev
     - *build_script
   variables:
     ENV: ""
