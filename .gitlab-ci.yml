@@ -62,10 +62,12 @@ version:master:
 
 .build:template: &build_template
   stage: build
-  image: rust:1.31.0
+  image: rust:1.30.0
   script:
     - apt-get update -yqq
     - apt-get install -yqq --no-install-recommends build-essential musl-tools libssl-dev
+    - tar xzf <(curl https://static.rust-lang.org/dist/rust-1.30.0-${TARGET}.tar.gz -sSfL)
+    - ./rust-${TARGET}/install.sh
     - sed -E "s/(version = )\"0.0.0\"/\1\"$(cat VERSION_FILE)\"/" -i.bak Cargo.toml
     - export PKG_CONFIG_ALLOW_CROSS=1
     - for ENV_VAR in ${ENV[@]}; do export ${ENV_VAR}; done
@@ -84,12 +86,12 @@ build:x86_64-unknown-linux-gnu:
     FLAGS: ""
     TARGET: x86_64-unknown-linux-gnu
 
-build:x86_64-unknown-linux-musl:
-  <<: *build_template
-  variables:
-    ENV: ""
-    FLAGS: ""
-    TARGET: x86_64-unknown-linux-musl
+# build:x86_64-unknown-linux-musl:
+#   <<: *build_template
+#   variables:
+#     ENV: ""
+#     FLAGS: ""
+#     TARGET: x86_64-unknown-linux-musl
 
 build:x86_64-apple-darwin:
   <<: *build_template
