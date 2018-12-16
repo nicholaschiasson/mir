@@ -71,9 +71,8 @@ version:master:
     - sed -E "s/(version = )\"0.0.0\"/\1\"$(cat VERSION_FILE)\"/" -i.bak Cargo.toml
     - export PKG_CONFIG_ALLOW_CROSS=1
     - for ENV_VAR in ${ENV[@]}; do export ${ENV_VAR}; done
-    - rustup set default-host ${TARGET}
     - "rustup toolchain install 1.31.0-${TARGET} ||:"
-    - "rustup target add ${TARGET} ||:"
+    - rustup set default-host ${TARGET}
     - cargo build --release --target ${TARGET} ${FLAGS}
   artifacts:
     paths:
