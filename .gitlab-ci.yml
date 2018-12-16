@@ -1,0 +1,120 @@
+image: alpine:latest
+
+stages:
+  - version
+  - test
+  - build
+  - publish
+
+variables:
+  VERSION_FILE: VERSION_FILE
+
+before_script:
+  - set -xe
+
+.version:template: &version_template
+  stage: version
+  script:
+    - &version_script |
+      tar xzf <(curl https://github.com/fsaintjacques/semver-tool/archive/2.1.0.tar.gz -sSfL) --strip-components=2 */src/semver
+      VERSION=$(git describe --tags 2> /dev/null || echo 0.0.0)
+      ./semver bump ${VERSION_BUMP} > ${VERSION_FILE}
+  artifacts:
+    paths:
+      - ${VERSION_FILE}
+    expire_in: 60 mins
+
+version:branches:
+  <<: *version_template
+  script:
+    - export VERSION_BUMP="build ${CI_PIPELINE_ID}"
+    - *version_script
+  only:
+    - branches
+  except:
+    - master
+
+version:master:
+  <<: *version_template
+  script:
+    - |
+      if git log --format=%s -n 1 | grep -i "Merge branch 'major/" > /dev/null; then
+        export VERSION_BUMP=major
+      elif git log --format=%s -n 1 | grep -i "Merge branch 'major/" > /dev/null; then
+        export VERSION_BUMP=minor
+      else
+        export VERSION_BUMP=patch
+      fi
+    - *version_script
+  only:
+    - master
+
+test:cargo:
+  image: rust:1.31.0
+  script:
+    - rustc --version && cargo --version
+    - cargo test --all --verbose
+  only:
+    - branches
+
+.build:template: &build_template
+  image: rust:1.31.0
+  script: &build_script |
+    rustup target add ${TARGET}
+    cargo build --release --target ${TARGET} --locked ${FLAGS}
+  artifacts:
+    paths:
+      - target/${TARGET}/release
+  except:
+    - master
+
+build:linux:
+  <<: *build_template
+  variables:
+    FLAGS: --features vendored-openssl
+    TARGET: x86_64-unknown-linux-musl
+
+build:macos:
+  <<: *build_template
+  script:
+    - export MACOSX_DEPLOYMENT_TARGET=10.7
+    - *build_script
+  variables:
+    FLAGS: ""
+    TARGET: x86_64-apple-darwin
+
+# # Template for build jobs
+# .build:template: &build_template
+#   stage: build
+#   only:
+#     - tags
+
+# # Generates a new tag from commits to master
+# publish:tag:
+#   stage: publish
+#   image: node:carbon-alpine
+#   script:
+#     - apk add --no-cache curl perl
+#     - npm install -g semver
+#     - echo "Version classification found to be '$(cat ${CLASSIFY_VERSION_FILE})'"
+#     - PREVIOUS_TAG="$(curl -qsX GET -H "Private-Token:${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/tags" | perl -pe 's/.*?"name":"([0-9]+\.[0-9]+\.[0-9]+)".*/\1/g' | perl -pe 's/\[(.*)\]/\1/g')"
+#     - LATEST_TAG="$(semver -i "$(cat "${CLASSIFY_VERSION_FILE}")" "${PREVIOUS_TAG}" || echo 0.0.1)"
+#     - curl -qsX POST -H "Private-Token:${GITLAB_API_TOKEN}" -F ref="${CI_COMMIT_REF_NAME}" -F tag_name="${LATEST_TAG}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/tags" > /dev/null 2>&1
+#   cache:
+#     paths:
+#       - "${CLASSIFY_VERSION_FILE}"
+#     policy: pull
+#   only:
+#     - master
+
+# # Updates the 'latest' tag to be equivalent to the last created tag
+# publish:latest:
+#   stage: publish
+#   script:
+#     - apk add --no-cache curl
+#     - curl -qsX DELETE -H "Private-Token:${GITLAB_API_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/tags/latest" > /dev/null 2>&1
+#     - curl -qsX POST -H "Private-Token:${GITLAB_API_TOKEN}" -F ref="${CI_COMMIT_TAG}" -F tag_name=latest "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/tags" > /dev/null 2>&1
+#   only:
+#     - tags
+#   except:
+#     - latest
