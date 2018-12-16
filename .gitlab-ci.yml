@@ -82,7 +82,7 @@ build:linux:
   <<: *build_template
   variables:
     ENV: ""
-    FLAGS: ""
+    FLAGS: "--features vendored-openssl"
     TARGET: x86_64-unknown-linux-musl
 
 build:macos:
