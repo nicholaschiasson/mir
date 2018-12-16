@@ -1,4 +1,4 @@
-image: busybox:latest
+image: bash
 
 stages:
   - version
