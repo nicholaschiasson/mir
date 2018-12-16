@@ -12,9 +12,6 @@ variables:
 before_script:
   - set -xe
 
-.version:stamp: &version_stamp |
-  sed -E "s/(version = )\"0.0.0\"/\1\"$(cat VERSION_FILE)\"/" -i.bak Cargo.toml
-
 .version:template: &version_template
   stage: version
   image: ubuntu:bionic
@@ -54,24 +51,23 @@ version:master:
   only:
     - master
 
-test:cargo:
-  stage: test
-  image: rust:1.31.0
-  script:
-    - *version_stamp
-    - rustc --version && cargo --version
-    - cargo test --all --verbose
-  only:
-    - branches
+# test:cargo:
+#   stage: test
+#   image: rust:1.31.0
+#   script:
+#     - rustc --version && cargo --version
+#     - cargo test --all --verbose
+#   only:
+#     - branches
 
 .build:template: &build_template
   stage: build
   image: rust:1.31.0
-  script:
-    - *version_stamp
-    - for ENV_VAR in ${ENV[@]}; do export ${ENV_VAR}; done
-    - rustup target add ${TARGET}
-    - cargo build --release --target ${TARGET} ${FLAGS}
+  script: &build_script |
+    sed -E "s/(version = )\"0.0.0\"/\1\"$(cat VERSION_FILE)\"/" -i.bak Cargo.toml
+    for ENV_VAR in ${ENV[@]}; do export ${ENV_VAR}; done
+    rustup target add ${TARGET}
+    cargo build --release --target ${TARGET} ${FLAGS}
   artifacts:
     paths:
       - target/${TARGET}/release
@@ -80,9 +76,12 @@ test:cargo:
 
 build:linux:
   <<: *build_template
+  script:
+    - apt-get update && apt-get install -y musl-tools
+    - *build_script
   variables:
     ENV: ""
-    FLAGS: "--features vendored-openssl"
+    FLAGS: ""
     TARGET: x86_64-unknown-linux-musl
 
 build:macos:
