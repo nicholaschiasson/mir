@@ -1,4 +1,4 @@
-image: ubuntu
+image: alpine
 
 stages:
   - version
@@ -12,8 +12,12 @@ variables:
 before_script:
   - set -xe
 
+.version:stamp: &version_stamp |
+  sed -E "s/(version = )\"0.0.0\"/\1\"$(cat VERSION_FILE)\"/" -i.bak Cargo.toml
+
 .version:template: &version_template
   stage: version
+  image: ubuntu:bionic
   script:
     - &version_script |
       apt-get update && apt-get install -y curl
@@ -54,6 +58,7 @@ test:cargo:
   stage: test
   image: rust:1.31.0
   script:
+    - *version_stamp
     - rustc --version && cargo --version
     - cargo test --all --verbose
   only:
@@ -62,9 +67,10 @@ test:cargo:
 .build:template: &build_template
   stage: build
   image: rust:1.31.0
-  script: &build_script |
-    rustup target add ${TARGET}
-    cargo build --release --target ${TARGET} --locked ${FLAGS}
+  script:
+    - *version_stamp
+    - rustup target add ${TARGET}
+    - ${ENV} cargo build --release --target ${TARGET} ${FLAGS}
   artifacts:
     paths:
       - target/${TARGET}/release
@@ -74,15 +80,14 @@ test:cargo:
 build:linux:
   <<: *build_template
   variables:
-    FLAGS: --features vendored-openssl
+    ENV: ""
+    FLAGS: ""
     TARGET: x86_64-unknown-linux-musl
 
 build:macos:
   <<: *build_template
-  script:
-    - export MACOSX_DEPLOYMENT_TARGET=10.7
-    - *build_script
   variables:
+    ENV: "MACOSX_DEPLOYMENT_TARGET=10.7"
     FLAGS: ""
     TARGET: x86_64-apple-darwin
 
