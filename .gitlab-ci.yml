@@ -63,41 +63,39 @@ version:master:
 .build:template: &build_template
   stage: build
   image: rust:1.31.0
-  script: &build_script |
-    sed -E "s/(version = )\"0.0.0\"/\1\"$(cat VERSION_FILE)\"/" -i.bak Cargo.toml
-    for ENV_VAR in ${ENV[@]}; do export ${ENV_VAR}; done
-    rustup target add ${TARGET}
-    cargo build --release --target ${TARGET} ${FLAGS}
+  script:
+    - apt-get update -yqq
+    - apt-get install -yqq --no-install-recommends build-essential musl-tools libssl-dev
+    - sed -E "s/(version = )\"0.0.0\"/\1\"$(cat VERSION_FILE)\"/" -i.bak Cargo.toml
+    - for ENV_VAR in ${ENV[@]}; do export ${ENV_VAR}; done
+    - rustup target add ${TARGET}
+    - cargo build --release --target ${TARGET} ${FLAGS}
   artifacts:
     paths:
       - target/${TARGET}/release
   except:
     - master
 
-build:linux:
+build:x86_64-unknown-linux-gnu:
   <<: *build_template
-  script:
-    - apt-get update && apt-get install -y musl-tools libssl-dev
-    - *build_script
+  variables:
+    ENV: ""
+    FLAGS: ""
+    TARGET: x86_64-unknown-linux-gnu
+
+build:x86_64-unknown-linux-musl:
+  <<: *build_template
   variables:
     ENV: ""
     FLAGS: ""
     TARGET: x86_64-unknown-linux-musl
 
-build:macos:
+build:x86_64-apple-darwin:
   <<: *build_template
   variables:
     ENV: "MACOSX_DEPLOYMENT_TARGET=10.7"
     FLAGS: ""
     TARGET: x86_64-apple-darwin
-  tags:
-    - osx
-
-# # Template for build jobs
-# .build:template: &build_template
-#   stage: build
-#   only:
-#     - tags
 
 # # Generates a new tag from commits to master
 # publish:tag:
