@@ -90,6 +90,8 @@ build:macos:
     ENV: "MACOSX_DEPLOYMENT_TARGET=10.7"
     FLAGS: ""
     TARGET: x86_64-apple-darwin
+  tags:
+    - osx
 
 # # Template for build jobs
 # .build:template: &build_template
