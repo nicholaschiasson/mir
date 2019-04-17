@@ -16,7 +16,9 @@ gitlab = { repository = "https://gitlab.com/leschiassons/tools/mir" }
 
 [dependencies]
 git2 = "0.8.0"
-gitlab = "0.1104.0"
+# gitlab = "0.1104.0"
+gitlab = { git = "https://gitlab.kitware.com/utils/rust-gitlab", rev = "5519edf4dd9aeeb05bf0975587d892189d8d5cad" }
 indicatif = "0.10.3"
+num = "0.2.0"
 rpassword = "2.1.0"
 structopt = "0.2.10"

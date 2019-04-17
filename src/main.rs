@@ -1,6 +1,7 @@
 use git2::{build::RepoBuilder, Cred, CredentialType, Error, FetchOptions, RemoteCallbacks};
 use gitlab::Gitlab;
 use indicatif::{ProgressBar, ProgressStyle};
+use num;
 use rpassword;
 use structopt::StructOpt;
 
@@ -12,6 +13,16 @@ use std::path::Path;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "mir")]
 struct CliArgs {
+    /**
+     * Access level of groups (and projects if --clone flag provided)
+     * -A     => Guest Access [default]
+     * -AA    => Reporter Access
+     * -AAA   => Developer Access
+     * -AAAA  => Maintainer Access
+     * -AAAAA => Owner Access
+     */
+    #[structopt(short = "A", long = "access-level", parse(from_occurrences))]
+    access_level: u8,
     /// Clone all repositories
     #[structopt(short = "c", long = "clone")]
     clone: bool,
@@ -31,14 +42,17 @@ struct CliArgs {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = CliArgs::from_args();
+    let access_level = format!("{}", num::clamp(args.access_level, 1, 5) * 10);
     let password = match args.personal_access_token {
         Some(p) => p,
         None => rpassword::prompt_password_stdout("Enter GitLab personal access token: ")?
     };
     let gitlab = Gitlab::new(&args.host, &password)?;
     let user = gitlab.current_user()?;
-    let projects = gitlab.owned_projects()?;
-    let namespaces = projects.iter().map(|ref p| &p.namespace.full_path).collect::<HashSet<_>>();
+    let groups = gitlab.groups(&[("min_access_level", &access_level)])?;
+    let projects = gitlab.projects(&[("min_access_level", &access_level)])?;
+    let mut namespaces = groups.iter().map(|ref g| &g.full_path).collect::<HashSet<_>>();
+    namespaces.insert(&user.username);
     for n in namespaces {
         let namespace = format!("{}/{}", args.destination, n);
         println!("mkdir '{}'", namespace);
