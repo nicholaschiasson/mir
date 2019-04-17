@@ -89,9 +89,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         repo_builder.fetch_options(fetch_options);
         for p in projects {
             let namespace = format!("{}/{}/{}", args.destination, p.namespace.full_path, p.name);
-            progress_bar.println(format!("Cloning into '{}'...", namespace));
             fs::create_dir_all(&namespace).expect(&format!("failed to create the directory '{}'", namespace));
-            repo_builder.clone(&p.http_url_to_repo, Path::new(&namespace))?;
+            if let Ok(_) = repo_builder.clone(&p.http_url_to_repo, Path::new(&namespace)) {
+                progress_bar.println(format!("Cloning into '{}'...", namespace));
+            } else {
+                progress_bar.println(format!("Failed to clone into '{}', it may already exist.\n", namespace));
+            }
             progress_bar.finish();
         }
         progress_bar.finish_and_clear();
