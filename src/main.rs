@@ -9,7 +9,7 @@ use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 
-/// Tool to mirror a user's entire owned GitLab group hierarchy locally and optionally clone all projects
+/// Tool to mirror a user's entire accessible GitLab group hierarchy locally and optionally clone all projects
 #[derive(StructOpt, Debug)]
 #[structopt(name = "mir")]
 struct CliArgs {
