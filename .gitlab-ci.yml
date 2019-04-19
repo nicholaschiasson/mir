@@ -65,7 +65,7 @@ build:x86_64-unknown-linux-musl:
   image: rust:1.31.0
   script:
     - apt update -y
-    - apt install -y musl-tools openssl-dev
+    - apt install -y musl-tools libssl-dev
     - rustup target add $TARGET
     - cargo build --release --target $TARGET --locked --features vendored-openssl
   variables:
