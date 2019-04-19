@@ -51,14 +51,14 @@ version:master:
   only:
     - master
 
-test:cargo:
-  stage: test
-  image: rust:1.31.0
-  script:
-    - rustc --version && cargo --version
-    - cargo test --all --verbose
-  only:
-    - branches
+# test:cargo:
+#   stage: test
+#   image: rust:1.31.0
+#   script:
+#     - rustc --version && cargo --version
+#     - cargo test --all --verbose
+#   only:
+#     - branches
 
 build:x86_64-unknown-linux-musl:
   stage: build
