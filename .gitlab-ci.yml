@@ -66,7 +66,7 @@ publish:crates:
   script:
     - sed -i "s/version = \"0.0.0\"/version = \"${CI_COMMIT_TAG}\"/" Cargo.toml
     - cargo login ${CRATES_IO_API_TOKEN}
-    - cargo publish
+    - cargo publish --allow-dirty
   only:
     - tags
   except:
