@@ -1,10 +1,26 @@
 [package]
 name = "mir"
-version = "0.1.0"
+version = "0.0.0"
 authors = ["Nicholas Omer Chiasson <nicholasomerchiasson@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "Tool to mirror a user's entire accessible GitLab group hierarchy locally and optionally clone all projects"
+readme = "README.md"
+homepage = "https://gitlab.com/leschiassons/tools/mir"
+repository = "https://gitlab.com/leschiassons/tools/mir"
+keywords = ["cli", "gitlab", "setup"]
+categories = ["command-line-utilities"]
+
+[badges]
+gitlab = { repository = "https://gitlab.com/leschiassons/tools/mir" }
+# travis-ci = { repository = "...", branch = "master" }
+maintenance = { status = "passively-maintained" }
 
 [dependencies]
-gitlab = "0.1104.0"
+git2 = "0.8.0"
+# gitlab = "0.1104.0"
+gitlab = { git = "https://gitlab.kitware.com/utils/rust-gitlab", rev = "5519edf4dd9aeeb05bf0975587d892189d8d5cad" }
+indicatif = "0.10.3"
+num = "0.2.0"
 rpassword = "2.1.0"
 structopt = "0.2.10"
