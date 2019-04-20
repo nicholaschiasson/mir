@@ -65,7 +65,7 @@ build:x86_64-unknown-linux-musl:
   image: rust:1.31.0
   script:
     - apt update -y
-    - apt install -y musl-tools pkg-config libssl-dev
+    - apt install -y musl-tools pkg-config libssl-dev libc6-dev-i386
     - mv -f /usr/include/x86_64-linux-gnu/openssl/opensslconf.h /usr/include/openssl/
     - dpkg -L libssl-dev
     - rustup target add $TARGET
