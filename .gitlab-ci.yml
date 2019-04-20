@@ -69,7 +69,7 @@ build:x86_64-unknown-linux-musl:
     - mv -f /usr/include/x86_64-linux-gnu/openssl/opensslconf.h /usr/include/openssl/
     - dpkg -L libssl-dev
     - rustup target add $TARGET
-    - cargo build --release --target $TARGET --locked --features vendored-openssl
+    - cargo build --release --target $TARGET --locked
   variables:
     # OPENSSL_DIR: /usr/include/x86_64-linux-gnu
     OPENSSL_INCLUDE_DIR: /usr/include
