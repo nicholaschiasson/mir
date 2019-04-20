@@ -66,11 +66,12 @@ build:x86_64-unknown-linux-musl:
   script:
     - apt update -y
     - apt install -y musl-tools pkg-config libssl-dev
+    - mv -f /usr/include/x86_64-linux-gnu/openssl/opensslconf.h /usr/include/openssl/
     - dpkg -L libssl-dev
     - rustup target add $TARGET
-    - cargo build --release --target $TARGET --locked
+    - cargo build --release --target $TARGET --locked --features vendored-openssl
   variables:
-    OPENSSL_DIR: /usr/include/x86_64-linux-gnu
+    # OPENSSL_DIR: /usr/include/x86_64-linux-gnu
     OPENSSL_INCLUDE_DIR: /usr/include
     OPENSSL_LIB_DIR: /usr/lib
     PKG_CONFIG_ALLOW_CROSS: 1
