@@ -67,9 +67,9 @@ build:x86_64-unknown-linux-musl:
     - apt update
     - apt install -y curl
     - curl https://sh.rustup.rs -sSf | sh -s -- -y
+    - source $HOME/.cargo/env
     - rustup show
     - rustup target add $TARGET
-    - source $HOME/.cargo/env
     - cargo build --release --target $TARGET --locked
   variables:
     TARGET: x86_64-unknown-linux-musl
