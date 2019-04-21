@@ -82,7 +82,7 @@ build:x86_64-unknown-linux-musl:
 
 build:x86_64-pc-windows-gnu:
   <<: *build_template
-  image: windows
+  image: mcr.microsoft.com/windows
   script:
     - powershell -command "Invoke-WebRequest https://win.rustup.rs/ -OutFile rustup-init.exe"
     - rustup-init.exe -y
