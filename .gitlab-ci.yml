@@ -84,7 +84,7 @@ build:x86_64-pc-windows-gnu:
   <<: *build_template
   image: mcr.microsoft.com/powershell
   script:
-    - wget -O rustup-init.exe https://win.rustup.rs/
+    - curl https://win.rustup.rs/ -sSfo rustup-init.exe
     - rustup-init.exe -y
     - cargo build --release --target $TARGET --locked
   variables:
