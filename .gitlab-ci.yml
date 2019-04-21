@@ -62,7 +62,7 @@ version:master:
 
 build:x86_64-unknown-linux-musl:
   stage: build
-  image: rust:stable
+  image: rust:latest
   services:
     - docker:dind
   script:
