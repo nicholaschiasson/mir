@@ -62,9 +62,10 @@ version:master:
 
 build:x86_64-unknown-linux-musl:
   stage: build
-  image: rust:latest
+  image: japaric/x86_64-unknown-linux-musl:latest
   script:
-    - cargo build --release --locked
+    - curl https://sh.rustup.rs -sSf | sh -y
+    - cargo build --release --target $TARGET --locked
   variables:
     TARGET: x86_64-unknown-linux-musl
   except:
