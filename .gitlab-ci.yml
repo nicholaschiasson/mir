@@ -82,10 +82,12 @@ build:x86_64-unknown-linux-musl:
 
 build:x86_64-pc-windows-gnu:
   <<: *build_template
-  image: mcr.microsoft.com/powershell
+  image: registry.gitlab.com/leschiassons/tools/mir/x86_64-pc-windows-gnu
   script:
-    - curl https://win.rustup.rs/ -sSfo rustup-init.exe
-    - rustup-init.exe -y
+    - curl https://sh.rustup.rs -sSf | sh -s -- -y
+    - source $HOME/.cargo/env
+    - rustup show
+    - rustup target add $TARGET
     - cargo build --release --target $TARGET --locked
   variables:
     TARGET: x86_64-pc-windows-gnu
