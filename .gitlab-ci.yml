@@ -82,7 +82,7 @@ build:x86_64-unknown-linux-musl:
 
 build:x86_64-pc-windows-gnu:
   <<: *build_template
-  image: registry.gitlab.com/leschiassons/tools/mir/x86_64-pc-windows-gnu
+  image: registry.gitlab.com/leschiassons/tools/mir/x86_64-pc-windows-gnu:minor-new-images
   script:
     - curl https://sh.rustup.rs -sSf | sh -s -- -y
     - source $HOME/.cargo/env
