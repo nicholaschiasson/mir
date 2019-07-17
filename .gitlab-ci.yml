@@ -47,7 +47,7 @@ version:master:
       else
         export VERSION_BUMP=patch
       fi
-    - semver -i ${VERSION_BUMP} ${VERSION} > ${VERSION_FILE}
+    - semver -i ${VERSION_BUMP} ${VERSION%%-*} > ${VERSION_FILE}
   only:
     - master
 
