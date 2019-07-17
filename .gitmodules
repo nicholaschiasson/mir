@@ -1,3 +1,0 @@
-[submodule "submodules/rust-gitlab"]
-	path = submodules/rust-gitlab
-	url = https://gitlab.kitware.com/utils/rust-gitlab
