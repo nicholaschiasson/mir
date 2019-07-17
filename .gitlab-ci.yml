@@ -51,14 +51,14 @@ version:master:
   only:
     - master
 
-# test:cargo:
-#   stage: test
-#   image: rust:1.31.0
-#   script:
-#     - rustc --version && cargo --version
-#     - cargo test --all --verbose
-#   only:
-#     - branches
+test:cargo:
+  stage: test
+  image: rust:1.36.0
+  script:
+    - rustc --version && cargo --version
+    - cargo test --all --verbose
+  only:
+    - branches
 
 .build:template: &build_template
   stage: build
@@ -82,19 +82,12 @@ build:x86_64-unknown-linux-musl:
 
 build:x86_64-pc-windows-gnu:
   <<: *build_template
-  image: registry.gitlab.com/leschiassons/tools/mir/x86_64-pc-windows-gnu:minor-new-images
-  script:
-    - curl https://sh.rustup.rs -sSf | sh -s -- -y
-    - source $HOME/.cargo/env
-    - rustup show
-    - rustup target add $TARGET
-    - cargo build --release --target $TARGET --locked
   variables:
     TARGET: x86_64-pc-windows-gnu
 
 publish:crates:
   stage: publish
-  image: rust:1.31.0
+  image: rust:1.36.0
   script:
     - sed -i "s/version = \"0.0.0\"/version = \"${CI_COMMIT_TAG}\"/" Cargo.toml
     - cargo login ${CRATES_IO_API_TOKEN}
