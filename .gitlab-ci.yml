@@ -29,6 +29,7 @@ version:branches:
   script:
     - *version_script
     - echo ${VERSION} > ${VERSION_FILE}
+    - echo ${VERSION%%-*}
   only:
     - branches
   except:
@@ -46,6 +47,7 @@ version:master:
         export VERSION_BUMP=minor
       else
         export VERSION_BUMP=patch
+        VERSION=${VERSION%%-*}
       fi
     - semver -i ${VERSION_BUMP} ${VERSION} > ${VERSION_FILE}
   only:
