@@ -15,6 +15,10 @@ before_script:
 .version:template: &version_template
   stage: version
   image: node:alpine
+  script:
+    - &version_script |
+      apk add --update --no-cache git
+      VERSION=$(git describe --tags 2> /dev/null || echo 0.0.0)
   artifacts:
     paths:
       - ${VERSION_FILE}
@@ -23,7 +27,8 @@ before_script:
 version:branches:
   <<: *version_template
   script:
-    - echo $(git describe --tags 2> /dev/null || echo 0.0.0) > ${VERSION_FILE}
+    - *version_script
+    - echo ${VERSION} > ${VERSION_FILE}
   only:
     - branches
   except:
@@ -32,9 +37,8 @@ version:branches:
 version:master:
   <<: *version_template
   script:
-    - apk add --update --no-cache git
+    - *version_script
     - npm install -g semver
-    - VERSION=$(git describe --tags 2> /dev/null || echo 0.0.0)
     - |
       if git log --format=%s -n 1 | grep -i "Merge branch 'major/" > /dev/null; then
         export VERSION_BUMP=major
