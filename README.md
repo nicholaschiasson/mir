@@ -1,7 +1,7 @@
 # mir
 
 Tool to mirror a user's entire accessible GitLab group hierarchy locally and
-optionally clone all projects
+optionally clone all projects.
 
 ```
 mir

@@ -4,7 +4,7 @@ version = "0.0.0"
 authors = ["Nicholas Omer Chiasson <nicholasomerchiasson@gmail.com>"]
 edition = "2018"
 license = "MIT"
-description = "Tool to mirror a user's entire accessible GitLab group hierarchy locally and optionally clone all projects"
+description = "Tool to mirror a user's entire accessible GitLab group hierarchy locally and optionally clone all projects."
 readme = "README.md"
 homepage = "https://gitlab.com/leschiassons/tools/mir"
 repository = "https://gitlab.com/leschiassons/tools/mir"
@@ -12,7 +12,7 @@ keywords = ["cli", "gitlab", "setup"]
 categories = ["command-line-utilities"]
 
 [badges]
-gitlab = { repository = "https://gitlab.com/leschiassons/tools/mir" }
+gitlab = { repository = "leschiassons/tools/mir" }
 # travis-ci = { repository = "...", branch = "master" }
 maintenance = { status = "passively-maintained" }
 
