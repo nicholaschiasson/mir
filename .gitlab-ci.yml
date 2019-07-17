@@ -29,7 +29,6 @@ version:branches:
   script:
     - *version_script
     - echo ${VERSION} > ${VERSION_FILE}
-    - echo ${VERSION%%-*}
   only:
     - branches
   except:
