@@ -18,6 +18,10 @@ matrix:
 
 cache: cargo
 
+stages:
+  - build
+  - deploy
+
 jobs:
   include:
     - stage: build
