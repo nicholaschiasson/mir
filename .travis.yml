@@ -1,10 +1,5 @@
 if: tag IS present AND tag != latest
 
-os:
-  - linux
-  - osx
-  - windows
-
 git:
   depth: false
 
@@ -26,10 +21,18 @@ cache: cargo
 jobs:
   include:
     - stage: build
+      os:
+        - linux
+        - osx
+        - windows
       before_script: sed -i "s/version = \"0.0.0\"/version = \"$(VERSION=${TRAVIS_TAG} ./version.sh tags)\"/" Cargo.toml
       script:
         - cargo build --verbose --release
     - stage: deploy
+      os:
+        - linux
+        - osx
+        - windows
       deploy:
         provider: releases
         api_key:
@@ -39,6 +42,10 @@ jobs:
         on:
           tags: true
     - stage: deploy
+      os:
+        - linux
+        - osx
+        - windows
       env:
         - TRAVIS_TAG=latest
       deploy:
