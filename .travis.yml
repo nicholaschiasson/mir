@@ -3,13 +3,26 @@ if: tag IS present AND tag != latest
 git:
   depth: false
 
+os:
+  - linux
+  - osx
+  - windows
+
 language: rust
+
+rust:
+  - stable
+  - beta
+  - nightly
 
 matrix:
   include:
-    - os: linux
-    - os: osx
-    - os: windows
+    - env: TRAVIS_TAG=${TRAVIS_TAG}
+    - env: TRAVIS_TAG=latest
+  allow_failures:
+    - beta
+    - nightly
+  fast_finish: true
 
 cache: cargo
 
@@ -19,34 +32,20 @@ stages:
 
 env:
   - BINARY_NAME=mir-${TRAVIS_TAG}-${TRAVIS_OS_NAME}
+  - VERSION=${TRAVIS_TAG}
 
-jobs:
-  include:
-    - stage: build
-      before_script: sed -i "s/version = \"0.0.0\"/version = \"$(VERSION=${TRAVIS_TAG} ./version.sh tags)\"/" Cargo.toml
-      script:
-        - cargo build --verbose --release
-    - stage: deploy
-      script:
-        - cp target/release/mir ${BINARY_NAME}
-      deploy:
-        provider: releases
-        api_key:
-          secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}
-        file: "${BINARY_NAME}"
-        skip_cleanup: true
-        on:
-          tags: true
-    - stage: deploy
-      env:
-        - TRAVIS_TAG=latest
-      script:
-        - cp target/release/mir ${BINARY_NAME}
-      deploy:
-        provider: releases
-        api_key:
-          secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}
-        file: "${BINARY_NAME}"
-        skip_cleanup: true
-        on:
-          tags: true
+before_script: sed -i "s/version = \"0.0.0\"/version = \"$(./version.sh tags)\"/" Cargo.toml
+
+script: cargo build --verbose --release
+
+before_deploy: cp target/release/mir ${BINARY_NAME}
+
+deploy:
+  provider: releases
+  api_key:
+    secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}
+  file: "${BINARY_NAME}"
+  skip_cleanup: true
+  on:
+    tags: true
+    rust: stable
