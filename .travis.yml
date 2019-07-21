@@ -1,11 +1,14 @@
-language: rust
-
 if: tag IS present AND tag != latest
 
 os:
   - linux
   - osx
   - windows
+
+git:
+  depth: false
+
+language: rust
 
 rust:
   - stable
@@ -20,5 +23,16 @@ matrix:
 
 cache: cargo
 
-git:
-  depth: false
+before_script: sed -i "s/version = \"0.0.0\"/version = \"$(VERSION=${TRAVIS_TAG} ./version.sh tags)\"/" Cargo.toml
+
+script:
+  - cargo build --verbose --release
+
+deploy:
+  provider: releases
+  api_key:
+    secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}
+  file: "target/release/mir"
+  skip_cleanup: true
+  on:
+    tags: true

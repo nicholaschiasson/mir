@@ -18,7 +18,7 @@ before_script:
   script:
     - &version_script |
       apk add --update --no-cache git
-      VERSION=$(git describe --tags 2> /dev/null || echo 0.0.0)
+      export VERSION=$(git describe --tags 2> /dev/null || echo 0.0.0)
   artifacts:
     paths:
       - ${VERSION_FILE}
@@ -28,7 +28,7 @@ version:branches:
   <<: *version_template
   script:
     - *version_script
-    - echo ${VERSION} > ${VERSION_FILE}
+    - ./version.sh branches > ${VERSION_FILE}
   only:
     - branches
   except:
@@ -39,22 +39,14 @@ version:master:
   script:
     - *version_script
     - npm install -g semver
-    - |
-      if git log --format=%s -n 1 | grep -i "Merge branch 'major/" > /dev/null; then
-        export VERSION_BUMP=major
-      elif git log --format=%s -n 1 | grep -i "Merge branch 'minor/" > /dev/null; then
-        export VERSION_BUMP=minor
-      else
-        export VERSION_BUMP=patch
-      fi
-    - semver -i ${VERSION_BUMP} ${VERSION%%-*} > ${VERSION_FILE}
+    - ./version.sh master > ${VERSION_FILE}
   only:
     - master
 
 version:tags:
   <<: *version_template
   script:
-    - echo ${CI_COMMIT_TAG} > ${VERSION_FILE}
+    - VERSION=${CI_COMMIT_TAG} ./version.sh tags > ${VERSION_FILE}
   only:
     - tags
   except:
