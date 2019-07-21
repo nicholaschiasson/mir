@@ -23,16 +23,29 @@ matrix:
 
 cache: cargo
 
-before_script: sed -i "s/version = \"0.0.0\"/version = \"$(VERSION=${TRAVIS_TAG} ./version.sh tags)\"/" Cargo.toml
-
-script:
-  - cargo build --verbose --release
-
-deploy:
-  provider: releases
-  api_key:
-    secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}
-  file: "target/release/mir"
-  skip_cleanup: true
-  on:
-    tags: true
+jobs:
+  include:
+    - stage: build
+      before_script: sed -i "s/version = \"0.0.0\"/version = \"$(VERSION=${TRAVIS_TAG} ./version.sh tags)\"/" Cargo.toml
+      script:
+        - cargo build --verbose --release
+    - stage: deploy
+      deploy:
+        provider: releases
+        api_key:
+          secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}
+        file: "target/release/mir"
+        skip_cleanup: true
+        on:
+          tags: true
+    - stage: deploy
+      env:
+        - TRAVIS_TAG=latest
+      deploy:
+        provider: releases
+        api_key:
+          secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}
+        file: "target/release/mir"
+        skip_cleanup: true
+        on:
+          tags: true

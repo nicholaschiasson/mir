@@ -13,7 +13,7 @@ categories = ["command-line-utilities"]
 
 [badges]
 gitlab = { repository = "leschiassons/tools/mir" }
-# travis-ci = { repository = "...", branch = "master" }
+travis-ci = { repository = "leschiassons/mir", branch = "latest" }
 maintenance = { status = "passively-maintained" }
 
 [dependencies]
