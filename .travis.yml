@@ -1,5 +1,7 @@
 language: rust
 
+if: tag IS present
+
 os:
   - linux
   - osx
