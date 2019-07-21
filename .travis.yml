@@ -1,6 +1,6 @@
 language: rust
 
-if: tag IS present
+if: tag IS present AND tag != latest
 
 os:
   - linux
