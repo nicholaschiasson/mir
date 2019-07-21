@@ -5,17 +5,11 @@ git:
 
 language: rust
 
-rust: stable
-
 matrix:
   include:
     - os: linux
     - os: osx
     - os: windows
-  allow_failures:
-    - rust: beta
-    - rust: nightly
-  fast_finish: true
 
 cache: cargo
 
