@@ -101,7 +101,7 @@ publish:tag:
   script:
     - apk add --update --no-cache curl
     - npm install -g semver
-    - curl -qsX POST -H "Private-Token:${GITLAB_API_TOKEN}" -F ref="${CI_COMMIT_SHA}" -F tag_name="$(cat "${VERSION_FILE}")" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/tags" > /dev/null 2>&1
+    - curl -qsX POST -H "Private-Token:${GITLAB_API_TOKEN}" -F ref="${CI_COMMIT_REF_NAME}" -F tag_name="$(cat "${VERSION_FILE}")" "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/repository/tags" > /dev/null 2>&1
   only:
     - master
 
