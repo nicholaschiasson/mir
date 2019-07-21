@@ -3,26 +3,22 @@ if: tag IS present AND tag != latest
 git:
   depth: false
 
-os:
-  - linux
-  - osx
-  - windows
-
 language: rust
-
-rust:
-  - stable
-  - beta
-  - nightly
 
 matrix:
   include:
     - env: BINARY_NAME=mir-${TRAVIS_TAG}-${TRAVIS_OS_NAME} VERSION=${TRAVIS_TAG} TRAVIS_TAG=${TRAVIS_TAG}
+      os: linux
+    - env: BINARY_NAME=mir-${TRAVIS_TAG}-${TRAVIS_OS_NAME} VERSION=${TRAVIS_TAG} TRAVIS_TAG=${TRAVIS_TAG}
+      os: osx
+    - env: BINARY_NAME=mir-${TRAVIS_TAG}-${TRAVIS_OS_NAME} VERSION=${TRAVIS_TAG} TRAVIS_TAG=${TRAVIS_TAG}
+      os: windows
     - env: BINARY_NAME=mir-${TRAVIS_TAG}-${TRAVIS_OS_NAME} VERSION=${TRAVIS_TAG} TRAVIS_TAG=latest
-  allow_failures:
-    - beta
-    - nightly
-  fast_finish: true
+      os: linux
+    - env: BINARY_NAME=mir-${TRAVIS_TAG}-${TRAVIS_OS_NAME} VERSION=${TRAVIS_TAG} TRAVIS_TAG=latest
+      os: osx
+    - env: BINARY_NAME=mir-${TRAVIS_TAG}-${TRAVIS_OS_NAME} VERSION=${TRAVIS_TAG} TRAVIS_TAG=latest
+      os: windows
 
 cache: cargo
 
