@@ -17,6 +17,9 @@ stages:
   - build
   - deploy
 
+env:
+  - BINARY_NAME=mir-${TRAVIS_TAG}-${TRAVIS_OS_NAME}
+
 jobs:
   include:
     - stage: build
@@ -24,22 +27,26 @@ jobs:
       script:
         - cargo build --verbose --release
     - stage: deploy
+      script:
+        - cp target/release/mir ${BINARY_NAME}
       deploy:
         provider: releases
         api_key:
           secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}
-        file: "target/release/mir"
+        file: "${BINARY_NAME}"
         skip_cleanup: true
         on:
           tags: true
     - stage: deploy
       env:
         - TRAVIS_TAG=latest
+      script:
+        - cp target/release/mir ${BINARY_NAME}
       deploy:
         provider: releases
         api_key:
           secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}
-        file: "target/release/mir"
+        file: "${BINARY_NAME}"
         skip_cleanup: true
         on:
           tags: true
