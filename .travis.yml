@@ -22,18 +22,13 @@ matrix:
 
 cache: cargo
 
-before_script: sed -i '' -e "s/version = \"0.0.0\"/version = \"$(./version.sh tags)\"/" Cargo.toml
+before_script: sed -i.bak "s/version = \"0.0.0\"/version = \"$(./version.sh tags)\"/" Cargo.toml
 
-script:
-  - cargo build --verbose --release
-  - find .
+script: cargo build --verbose --release
 
-before_deploy:
-  - cp target/release/mir ${BINARY_NAME}
-  - find .
+before_deploy: cp ${BINARY_OUT} ${BINARY_NAME}
 
 deploy:
-  script: find .
   provider: releases
   api_key:
     secure: ${GITHUB_PERSONAL_ACCESS_TOKEN}

@@ -52,14 +52,14 @@ version:tags:
   except:
     - latest
 
-# test:cargo:
-#   stage: test
-#   image: rust:1.36.0
-#   script:
-#     - rustc --version && cargo --version
-#     - cargo test --all --verbose
-#   only:
-#     - branches
+test:cargo:
+  stage: test
+  image: rust:1.36.0
+  script:
+    - rustc --version && cargo --version
+    - cargo test --all --verbose
+  only:
+    - branches
 
 .build:template: &build_template
   stage: build
