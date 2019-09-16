@@ -419,7 +419,7 @@ dependencies = [
 
 [[package]]
 name = "gitlab"
-version = "0.1200.0"
+version = "0.1111.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "chrono 0.4.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -745,7 +745,7 @@ name = "mir"
 version = "0.0.0"
 dependencies = [
  "git2 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "gitlab 0.1200.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gitlab 0.1111.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "indicatif 0.10.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "num 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rpassword 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1805,7 +1805,7 @@ dependencies = [
 "checksum futures-cpupool 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)" = "ab90cde24b3319636588d0c35fe03b1333857621051837ed769faefb4c2162e4"
 "checksum getrandom 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "e65cce4e5084b14874c4e7097f38cab54f47ee554f9194673456ea379dcc4c55"
 "checksum git2 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c7339329bfa14a00223244311560d11f8f489b453fb90092af97f267a6090ab0"
-"checksum gitlab 0.1200.0 (registry+https://github.com/rust-lang/crates.io-index)" = "28bdb063b8cd8056dd6e5a538f17572f2c4b1d171166e1f35b401ae94bbebc75"
+"checksum gitlab 0.1111.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7393c3fdcbab5275383f189039b4eebc2630ebc36daa3e050a8717cb7062f536"
 "checksum h2 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)" = "a539b63339fbbb00e081e84b6e11bd1d9634a82d91da2984a18ac74a8823f392"
 "checksum heck 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "20564e78d53d2bb135c343b3f47714a56af2061f1c928fdb541dc7b9fdd94205"
 "checksum http 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)" = "eed324f0f0daf6ec10c474f150505af2c143f251722bf9dbd1261bd1f2ee2c1a"
