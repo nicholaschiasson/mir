@@ -7,6 +7,7 @@ stages:
   - publish
 
 variables:
+  RUST_DOCKER_IMAGE_VERSION: 1.44.1
   VERSION_FILE: VERSION_FILE
 
 before_script:
@@ -54,7 +55,7 @@ version:tags:
 
 test:rustfmt:
   stage: test
-  image: rust:1.36.0
+  image: rust:${RUST_DOCKER_IMAGE_VERSION}
   before_script:
     - rustup component add rustfmt
   script:
@@ -65,7 +66,7 @@ test:rustfmt:
 
 test:cargo:
   stage: test
-  image: rust:1.36.0
+  image: rust:${RUST_DOCKER_IMAGE_VERSION}
   script:
     - rustc --version && cargo --version
     - cargo test --all --verbose
@@ -95,7 +96,7 @@ build:x86_64-unknown-linux-musl:
 
 publish:crates:
   stage: publish
-  image: rust:1.36.0
+  image: rust:${RUST_DOCKER_IMAGE_VERSION}
   script:
     - sed -i "s/version = \"0.0.0\"/version = \"$(cat "${VERSION_FILE}")\"/" Cargo.toml
     - cargo login ${CRATES_IO_API_TOKEN}
