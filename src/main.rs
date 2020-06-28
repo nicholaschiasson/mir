@@ -1,3 +1,4 @@
+use dirs;
 use git2::{build::RepoBuilder, Cred, Error, FetchOptions, RemoteCallbacks};
 use gitlab::Gitlab;
 use indicatif::{ProgressBar, ProgressStyle};
@@ -6,7 +7,6 @@ use rpassword;
 use structopt::StructOpt;
 
 use std::collections::HashSet;
-use std::env;
 use std::fs;
 use std::path::Path;
 
@@ -83,7 +83,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 				if allowed_types.is_ssh_key() {
 					let mut private_key = Path::new(&ssh_private_key).to_path_buf();
 					if let Ok(suffix) = private_key.strip_prefix("~") {
-						private_key = env::home_dir()
+						private_key = dirs::home_dir()
 							.ok_or_else(|| {
 								Error::from_str("Can't find home directory to locate SSH private key")
 							})?

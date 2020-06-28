@@ -16,6 +16,7 @@ gitlab = { repository = "leschiassons/tools/mir" }
 maintenance = { status = "passively-maintained" }
 
 [dependencies]
+dirs = "3.0.0"
 git2 = "0.8.0"
 gitlab = "0.1111.0"
 indicatif = "0.10.3"
