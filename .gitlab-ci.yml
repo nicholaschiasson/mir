@@ -52,6 +52,17 @@ version:tags:
   except:
     - latest
 
+test:rustfmt:
+  stage: test
+  image: rust:1.36.0
+  before_script:
+    - rustup component add rustfmt
+  script:
+    - rustc --version && cargo --version
+    - cargo fmt -- --check
+  only:
+    - branches
+
 test:cargo:
   stage: test
   image: rust:1.36.0
