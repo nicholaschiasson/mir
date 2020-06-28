@@ -18,7 +18,7 @@ maintenance = { status = "passively-maintained" }
 [dependencies]
 dirs = "3.0.0"
 git2 = "0.13.6"
-gitlab = "0.1301.0"
+gitlab = "0.1111.0"
 indicatif = "0.15.0"
 num = "0.3.0"
 rpassword = "4.0.5"
