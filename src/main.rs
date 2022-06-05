@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	let access_level = format!("{}", num::clamp(args.access_level, 1, 5) * 10);
 	let password = match args.personal_access_token {
 		Some(p) => p,
-		None => rpassword::prompt_password_stdout("Enter GitLab personal access token: ")?,
+		None => rpassword::prompt_password("Enter GitLab personal access token: ")?,
 	};
 	let gitlab = Gitlab::new(&args.host, &password)?;
 	let user = gitlab.current_user()?;
