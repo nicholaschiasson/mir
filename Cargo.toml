@@ -2,7 +2,7 @@
 name = "mir"
 version = "0.0.0"
 authors = ["Nicholas Omer Chiasson <nicholasomerchiasson@gmail.com>"]
-edition = "2018"
+edition = "2021"
 license = "MIT"
 description = "Tool to mirror a user's entire accessible GitLab group hierarchy locally and optionally clone all projects."
 readme = "README.md"
@@ -16,10 +16,10 @@ gitlab = { repository = "leschiassons/tools/mir" }
 maintenance = { status = "passively-maintained" }
 
 [dependencies]
-dirs = "4.0.0"
-git2 = "0.13.25"
-gitlab = "0.1111.0"
-indicatif = "0.16.2"
-num = "0.4.0"
-rpassword = "6.0.1"
-structopt = "0.3.26"
+dirs = "4.0"
+git2 = "0.14"
+gitlab = "0.1111"
+indicatif = "0.16"
+num = "0.4"
+rpassword = "6.0"
+structopt = "0.3"

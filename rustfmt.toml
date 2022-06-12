@@ -1,4 +1,4 @@
-edition = "2018"
+edition = "2021"
 hard_tabs = true
 imports_layout = "Vertical"
 match_block_trailing_comma = true
