@@ -7,7 +7,7 @@ stages:
   - publish
 
 variables:
-  RUST_DOCKER_IMAGE_VERSION: 1.56.1
+  RUST_DOCKER_IMAGE_VERSION: "1.61"
   VERSION_FILE: VERSION_FILE
 
 before_script:

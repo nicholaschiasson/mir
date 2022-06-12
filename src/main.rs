@@ -127,7 +127,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 				Ok(_) => progress_bar.println(format!("Cloning into '{}'...", namespace)),
 				Err(error) => {
 					progress_bar.println(format!("Failed to clone into '{}': {}\n", namespace, error))
-				}
+				},
 			}
 			progress_bar.finish();
 		}
