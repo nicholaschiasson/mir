@@ -86,8 +86,7 @@ test:cargo:
     - rustup target add $TARGET
     - cargo build --release --target $TARGET
   except:
-    - master
-    - latest
+    - tags
 
 build:x86_64-unknown-linux-musl:
   <<: *build_template
@@ -106,7 +105,7 @@ publish:crates:
   except:
     - latest
 
-# # Generates a new tag from commits to master
+# Generates a new tag from commits to master
 publish:tag:
   stage: publish
   image: node:alpine
@@ -117,7 +116,7 @@ publish:tag:
   only:
     - master
 
-# # Updates the 'latest' tag to be equivalent to the last created tag
+# Updates the 'latest' tag to be equivalent to the last created tag
 publish:latest:
   stage: publish
   script:
