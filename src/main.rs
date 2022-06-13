@@ -3,7 +3,6 @@ use dirs;
 use git2::{build::RepoBuilder, Cred, Error, FetchOptions, RemoteCallbacks};
 use gitlab::api::common::AccessLevel;
 use gitlab::api::{groups, projects, users, Query};
-use gitlab::types::{Group, Project, User};
 use gitlab::Gitlab;
 use indicatif::{ProgressBar, ProgressStyle};
 use rpassword;
@@ -11,6 +10,8 @@ use rpassword;
 use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
+
+mod model;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -68,12 +69,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		None => rpassword::prompt_password("Enter GitLab personal access token: ")?,
 	};
 	let client = Gitlab::new(&args.host, &password)?;
-	let ret_user: User = users::CurrentUser::builder().build()?.query(&client)?;
-	let ret_groups: Vec<Group> = groups::Groups::builder()
+	let ret_user: model::User = users::CurrentUser::builder().build()?.query(&client)?;
+	let ret_groups: Vec<model::Group> = groups::Groups::builder()
 		.min_access_level(access_level)
 		.build()?
 		.query(&client)?;
-	let ret_projects: Vec<Project> = projects::Projects::builder()
+	let ret_projects: Vec<model::Project> = projects::Projects::builder()
 		.min_access_level(access_level)
 		.build()?
 		.query(&client)?;

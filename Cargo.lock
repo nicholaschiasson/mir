@@ -805,6 +805,7 @@ dependencies = [
  "gitlab",
  "indicatif",
  "rpassword",
+ "serde",
 ]
 
 [[package]]
