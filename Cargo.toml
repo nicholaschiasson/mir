@@ -16,10 +16,9 @@ gitlab = { repository = "leschiassons/tools/mir" }
 maintenance = { status = "passively-maintained" }
 
 [dependencies]
+clap = { version = "3.0", features = ["derive"] }
 dirs = "4.0"
 git2 = "0.14"
-gitlab = "0.1111"
+gitlab = "0.1500"
 indicatif = "0.16"
-num = "0.4"
 rpassword = "6.0"
-structopt = "0.3"

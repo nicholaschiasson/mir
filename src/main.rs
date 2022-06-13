@@ -1,65 +1,87 @@
+use clap::Parser;
 use dirs;
 use git2::{build::RepoBuilder, Cred, Error, FetchOptions, RemoteCallbacks};
+use gitlab::api::common::AccessLevel;
+use gitlab::api::{groups, projects, users, Query};
+use gitlab::types::{Group, Project, User};
 use gitlab::Gitlab;
 use indicatif::{ProgressBar, ProgressStyle};
-use num;
 use rpassword;
-use structopt::StructOpt;
 
 use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 
-/// Tool to mirror a user's entire accessible GitLab group hierarchy locally and optionally clone all projects.
-#[derive(StructOpt, Debug)]
-#[structopt(name = "mir")]
-struct CliArgs {
-	/**
-	 * Access level of groups (and projects if --clone flag provided)
-	 * -A     => Guest Access [default]
-	 * -AA    => Reporter Access
-	 * -AAA   => Developer Access
-	 * -AAAA  => Maintainer Access
-	 * -AAAAA => Owner Access
-	 */
-	#[structopt(short = "A", long = "access-level", parse(from_occurrences))]
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+	#[clap(
+		short = 'A',
+		long,
+		parse(from_occurrences),
+		takes_value = false,
+		help = "Access level of groups (and projects if --clone flag provided)
+-A     => Guest Access [default]
+-AA    => Reporter Access
+-AAA   => Developer Access
+-AAAA  => Maintainer Access
+-AAAAA => Owner Access"
+	)]
 	access_level: u8,
 	/// Clone all repositories
-	#[structopt(short = "c", long = "clone")]
+	#[clap(short, long)]
 	clone: bool,
 	/// The destination directory in which the hierarchy should be mirrored
-	#[structopt(short = "d", long = "destination", default_value = ".")]
+	#[clap(short, long, default_value = ".")]
 	destination: String,
 	/// GitLab remote host
-	#[structopt(short = "H", long = "host", default_value = "gitlab.com")]
+	#[clap(short = 'H', long, default_value = "gitlab.com")]
 	host: String,
 	/// GitLab personal access token
-	#[structopt(short = "p", long = "personal-access-token")]
+	#[clap(short, long)]
 	personal_access_token: Option<String>,
-	// /// Verbose mode (-v, -vv, -vvv, etc.)
-	// #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
-	// verbose: u8,
 	/// SSH private key
-	#[structopt(short = "s", long = "ssh-private-key", default_value = "~/.ssh/id_rsa")]
+	#[clap(short, long, default_value = "~/.ssh/id_rsa")]
 	ssh_private_key: String,
+	// /// Verbose mode (-v, -vv, -vvv, etc.)
+	// #[clap(short, long, parse(from_occurrences))]
+	// verbose: u8,
+}
+
+fn into_access_level(access_level: u8) -> Result<AccessLevel, Box<dyn std::error::Error>> {
+	match access_level.clamp(1, 5) {
+		1 => Ok(AccessLevel::Guest),
+		2 => Ok(AccessLevel::Reporter),
+		3 => Ok(AccessLevel::Developer),
+		4 => Ok(AccessLevel::Maintainer),
+		5 => Ok(AccessLevel::Owner),
+		// This error should be impossible to trigger because we clamp the access level
+		a => Err(format!("Casting AccessLevel from invalid number {}.", a).into()),
+	}
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-	let args = CliArgs::from_args();
-	let access_level = format!("{}", num::clamp(args.access_level, 1, 5) * 10);
+	let args = Args::parse();
+	let access_level: AccessLevel = into_access_level(args.access_level)?;
 	let password = match args.personal_access_token {
 		Some(p) => p,
 		None => rpassword::prompt_password("Enter GitLab personal access token: ")?,
 	};
-	let gitlab = Gitlab::new(&args.host, &password)?;
-	let user = gitlab.current_user()?;
-	let groups = gitlab.groups(&[("min_access_level", &access_level)])?;
-	let projects = gitlab.projects(&[("min_access_level", &access_level)])?;
-	let mut namespaces = groups
+	let client = Gitlab::new(&args.host, &password)?;
+	let ret_user: User = users::CurrentUser::builder().build()?.query(&client)?;
+	let ret_groups: Vec<Group> = groups::Groups::builder()
+		.min_access_level(access_level)
+		.build()?
+		.query(&client)?;
+	let ret_projects: Vec<Project> = projects::Projects::builder()
+		.min_access_level(access_level)
+		.build()?
+		.query(&client)?;
+	let mut namespaces = ret_groups
 		.iter()
 		.map(|ref g| &g.full_path)
 		.collect::<HashSet<_>>();
-	namespaces.insert(&user.username);
+	namespaces.insert(&ret_user.username);
 	for n in namespaces {
 		let namespace = format!("{}/{}", args.destination, n);
 		println!("mkdir '{}'", namespace);
@@ -77,7 +99,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		remote_callbacks
 			.credentials(move |_, username_from_url, allowed_types| {
 				if allowed_types.is_user_pass_plaintext() {
-					return Cred::userpass_plaintext(&user.username, &password);
+					return Cred::userpass_plaintext(&ret_user.username, &password);
 				}
 
 				if allowed_types.is_ssh_key() {
@@ -119,7 +141,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		fetch_options.remote_callbacks(remote_callbacks);
 		let mut repo_builder = RepoBuilder::new();
 		repo_builder.fetch_options(fetch_options);
-		for p in projects {
+		for p in ret_projects {
 			let namespace = format!("{}/{}/{}", args.destination, p.namespace.full_path, p.name);
 			fs::create_dir_all(&namespace)
 				.expect(&format!("failed to create the directory '{}'", namespace));
