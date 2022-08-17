@@ -2,7 +2,7 @@ use clap::Parser;
 use dirs;
 use git2::{build::RepoBuilder, Cred, Error, FetchOptions, RemoteCallbacks};
 use gitlab::api::common::AccessLevel;
-use gitlab::api::{groups, projects, users, Query};
+use gitlab::api::{self, groups, projects, users, Pagination, Query};
 use gitlab::Gitlab;
 use indicatif::{ProgressBar, ProgressStyle};
 use rpassword;
@@ -70,14 +70,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	};
 	let client = Gitlab::new(&args.host, &password)?;
 	let ret_user: model::User = users::CurrentUser::builder().build()?.query(&client)?;
-	let ret_groups: Vec<model::Group> = groups::Groups::builder()
-		.min_access_level(access_level)
-		.build()?
-		.query(&client)?;
-	let ret_projects: Vec<model::Project> = projects::Projects::builder()
-		.min_access_level(access_level)
-		.build()?
-		.query(&client)?;
+	let ret_groups: Vec<model::Group> = api::paged(
+		groups::Groups::builder()
+			.min_access_level(access_level)
+			.build()?,
+		Pagination::All,
+	)
+	.query(&client)?;
+	let ret_projects: Vec<model::Project> = api::paged(
+		projects::Projects::builder()
+			.min_access_level(access_level)
+			.build()?,
+		Pagination::All,
+	)
+	.query(&client)?;
 	let mut namespaces = ret_groups
 		.iter()
 		.map(|ref g| &g.full_path)
