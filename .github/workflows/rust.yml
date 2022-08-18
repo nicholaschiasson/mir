@@ -1,0 +1,78 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --release --verbose
+    - name: Run checks
+      run: cargo check --verbose
+    - name: Run formatter
+      run: cargo fmt --check --verbose
+    - name: Run linter
+      run: rustup component add clippy && cargo clippy --verbose
+    - name: Run tests
+      run: cargo test --verbose
+    - name: Upload Windows Build Artifact
+      if: ${{ startsWith(matrix.platform, 'windows') }}
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: mir.exe
+        path: target/release/mir.exe
+    - name: Upload Non-Windows Build Artifact
+      if: ${{ !startsWith(matrix.platform, 'windows') }}
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: mir
+        path: target/release/mir
+        
+  tag:
+    runs-on: ubuntu-latest
+    name: Tag
+    needs: [build]
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && (success() || failure()) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check semver bump
+        id: check-semver
+        run: |
+          if [[ "${{ github.event.head_commit.message }}" =~ ^Merge\ pull\ request\ #[0-9]+\ from\ [^/]+/patch/.+$ ]]; then
+            echo ::set-output name=semver::patch
+          elif [[ "${{ github.event.head_commit.message }}" =~ ^Merge\ pull\ request\ #[0-9]+\ from\ [^/]+/major/.+$ ]]; then
+            echo ::set-output name=semver::major
+          else
+            echo ::set-output name=semver::minor
+          fi
+      - name: Bump major version and push tag
+        if: ${{ steps.check-semver.outputs.semver == 'major' }}
+        uses: anothrNick/github-tag-action@1.17.2
+        env:
+          DEFAULT_BUMP: major
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Bump minor version and push tag
+        if: ${{ steps.check-semver.outputs.semver == 'minor' }}
+        uses: anothrNick/github-tag-action@1.17.2
+        env:
+          DEFAULT_BUMP: minor
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Bump patch version and push tag
+        if: ${{ steps.check-semver.outputs.semver == 'patch' }}
+        uses: anothrNick/github-tag-action@1.17.2
+        env:
+          DEFAULT_BUMP: patch
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
