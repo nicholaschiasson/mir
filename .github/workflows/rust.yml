@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build
-      run: cargo build --release --verbose
+      run: cargo build --verbose
     - name: Run checks
       run: cargo check --verbose
     - name: Run formatter
@@ -27,24 +27,11 @@ jobs:
       run: rustup component add clippy && cargo clippy --verbose
     - name: Run tests
       run: cargo test --verbose
-    - name: Upload Windows Build Artifact
-      if: ${{ startsWith(matrix.platform, 'windows') }}
-      uses: actions/upload-artifact@v3.1.0
-      with:
-        name: mir.exe
-        path: target/release/mir.exe
-    - name: Upload Non-Windows Build Artifact
-      if: ${{ !startsWith(matrix.platform, 'windows') }}
-      uses: actions/upload-artifact@v3.1.0
-      with:
-        name: mir
-        path: target/release/mir
         
   tag:
     runs-on: ubuntu-latest
     name: Tag
     needs: [build]
-    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && (success() || failure()) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
