@@ -35,7 +35,7 @@ jobs:
         path: target/release/mir.exe
     - name: Upload Non-Windows Build Artifact
       if: ${{ !startsWith(matrix.platform, 'windows') }}
-      uses: actions/upload-artifact@v3.1
+      uses: actions/upload-artifact@v3.1.0
       with:
         name: mir
         path: target/release/mir
