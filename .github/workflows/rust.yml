@@ -30,7 +30,6 @@ jobs:
         
   tag:
     runs-on: ubuntu-latest
-    name: Tag
     needs: [build]
     steps:
       - name: Checkout
