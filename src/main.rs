@@ -1,11 +1,10 @@
 use clap::Parser;
-use dirs;
+
 use git2::{build::RepoBuilder, Cred, Error, FetchOptions, RemoteCallbacks};
 use gitlab::api::common::AccessLevel;
 use gitlab::api::{groups, projects, users, Query};
 use gitlab::Gitlab;
 use indicatif::{ProgressBar, ProgressStyle};
-use rpassword;
 
 use std::collections::HashSet;
 use std::fs;
@@ -80,7 +79,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		.query(&client)?;
 	let mut namespaces = ret_groups
 		.iter()
-		.map(|ref g| &g.full_path)
+		.map(|g| &g.full_path)
 		.collect::<HashSet<_>>();
 	namespaces.insert(&ret_user.username);
 	for n in namespaces {
@@ -145,12 +144,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		for p in ret_projects {
 			let namespace = format!("{}/{}/{}", args.destination, p.namespace.full_path, p.name);
 			fs::create_dir_all(&namespace)
-				.expect(&format!("failed to create the directory '{}'", namespace));
-			match repo_builder.clone(&p.http_url_to_repo, Path::new(&namespace)) {
-				Ok(_) => progress_bar.println(format!("Cloning into '{}'...", namespace)),
-				Err(error) => {
-					progress_bar.println(format!("Failed to clone into '{}': {}\n", namespace, error))
-				},
+				.unwrap_or_else(|_| panic!("failed to create the directory '{}'", namespace));
+			progress_bar.println(format!("Cloning into '{namespace}'..."));
+			if let Err(e) = repo_builder.clone(&p.http_url_to_repo, Path::new(&namespace)) {
+				progress_bar.println(format!("Failed to clone into '{namespace}': {e}"));
 			}
 			progress_bar.finish();
 		}
