@@ -2,9 +2,13 @@ name: Rust
 
 on:
   push:
-    branches: [ "master" ]
+    branches: 
+      - 'master'
+    paths-ignore:
+      - '.github/workflows/release.yml'
   pull_request:
-    branches: [ "master" ]
+    branches: 
+      - 'master'
 
 env:
   CARGO_TERM_COLOR: always
@@ -16,18 +20,18 @@ jobs:
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
-    - name: Run checks
-      run: cargo check --verbose
-    - name: Run formatter
-      run: cargo fmt --check --verbose
-    - name: Run linter
-      run: rustup component add clippy && cargo clippy --verbose
-    - name: Run tests
-      run: cargo test --verbose
-        
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build --verbose
+      - name: Run checks
+        run: cargo check --verbose
+      - name: Run formatter
+        run: cargo fmt --check --verbose
+      - name: Run linter
+        run: rustup component add clippy && cargo clippy --verbose
+      - name: Run tests
+        run: cargo test --verbose
+
   tag:
     runs-on: ubuntu-latest
     needs: [build]
