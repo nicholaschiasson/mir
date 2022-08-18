@@ -1,0 +1,53 @@
+name: Rust
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --release --verbose
+    - name: Upload Windows Build Artifact
+      if: ${{ startsWith(matrix.platform, 'windows') }}
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: bin/${{ matrix.platform }}/mir.exe
+        path: target/release/mir.exe
+    - name: Upload Non-Windows Build Artifact
+      if: ${{ !startsWith(matrix.platform, 'windows') }}
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: bin/${{ matrix.platform }}/mir
+        path: target/release/mir
+  
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: |
+        sed -i "s/version = \"0.0.0\"/version = \"$(cat "${VERSION_FILE}")\"/" Cargo.toml
+        cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
+        cargo publish --allow-dirty --verbose
+  
+  release:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v3.0.0
+    - name: release-please-action
+      uses: google-github-actions/release-please-action@v3.3.0
+      with:
+        release-type: rust
