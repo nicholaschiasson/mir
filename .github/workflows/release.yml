@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
+      - latest
 
 env:
   CARGO_TERM_COLOR: always
@@ -25,8 +26,9 @@ jobs:
             BINARY_NAME=${BINARY_NAME}.exe
           fi
           echo ${BINARY_NAME}
-          cargo build --release --verbose
-          cp target/release/${BINARY_NAME} ./
+        #  cargo build --release --verbose
+        #  cp target/release/${BINARY_NAME} ./
+          echo "hello ${{ runner.os }} on ${{ runner.arch }}" > ${BINARY_name}
           tar czf mir-${{ runner.os }}-${{ runner.arch }}.tar.gz ${BINARY_NAME}
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3.1.0
@@ -40,8 +42,8 @@ jobs:
       - name: Publish to crates.io
         run: |
           sed -i "s/version = \"0.0.0\"/version = \"${{ github.ref_name }}\"/" Cargo.toml
-  #        cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
-  #        cargo publish --allow-dirty --verbose
+        #   cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
+        #   cargo publish --allow-dirty --verbose
 
   release:
     runs-on: ubuntu-latest
