@@ -41,9 +41,11 @@ jobs:
       - name: Check semver bump
         id: check-semver
         run: |
-          if [[ "${{ github.event.head_commit.message }}" =~ ^Merge\ pull\ request\ #[0-9]+\ from\ [^/]+/patch/.+$ ]]; then
+          if [[ "${{ github.event.head_commit.message }}" =~ ^Merge\ pull\ request\ #[0-9]+\ from\ [^/]+/patch/.+$ ]]
+          then
             echo ::set-output name=semver::patch
-          elif [[ "${{ github.event.head_commit.message }}" =~ ^Merge\ pull\ request\ #[0-9]+\ from\ [^/]+/major/.+$ ]]; then
+          elif [[ "${{ github.event.head_commit.message }}" =~ ^Merge\ pull\ request\ #[0-9]+\ from\ [^/]+/major/.+$ ]]
+          then
             echo ::set-output name=semver::major
           else
             echo ::set-output name=semver::minor
@@ -73,8 +75,10 @@ jobs:
         id: stamp
         run: |
           if [[ "${{ steps.check-semver.outputs.semver }}" == patch ]]
+          then
             VERSION=${{ steps.bump-patch.outputs.new_tag }}
           elif [[ "${{ steps.check-semver.outputs.semver }}" == major ]]
+          then
             VERSION=${{ steps.bump-major.outputs.new_tag }}
           else
             VERSION=${{ steps.bump-minor.outputs.new_tag }}
