@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
+      - 'latest'
 
 env:
   CARGO_TERM_COLOR: always
@@ -25,8 +26,9 @@ jobs:
             BINARY_NAME=${BINARY_NAME}.exe
           fi
           echo ${BINARY_NAME}
-          cargo build --release --verbose
-          cp target/release/${BINARY_NAME} ./
+#          cargo build --release --verbose
+#          cp target/release/${BINARY_NAME} ./
+          echo "hello ${{ runner.os }} on ${{ runner.arch }} with version ${{ github.ref_name }}" > ${BINARY_NAME}
           tar czf mir-${{ runner.os }}-${{ runner.arch }}.tar.gz ${BINARY_NAME}
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3.1.0
