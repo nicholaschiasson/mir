@@ -6,13 +6,13 @@ edition = "2021"
 license = "MIT"
 description = "Tool to mirror a user's entire accessible GitLab group hierarchy locally and optionally clone all projects."
 readme = "README.md"
-homepage = "https://gitlab.com/leschiassons/tools/mir"
-repository = "https://gitlab.com/leschiassons/tools/mir"
+homepage = "https://github.com/nicholaschiasson/mir"
+repository = "https://github.com/nicholaschiasson/mir"
 keywords = ["cli", "gitlab", "setup"]
 categories = ["command-line-utilities"]
 
 [badges]
-gitlab = { repository = "leschiassons/tools/mir" }
+github = { repository = "nicholaschiasson/mir" }
 maintenance = { status = "passively-maintained" }
 
 [dependencies]
