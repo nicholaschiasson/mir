@@ -1,15 +1,14 @@
 name: Release
 
 on:
-  create:
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
+  create
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
+    if: ${{ github.ref_type == 'tag' }}
     strategy:
       matrix:
         platform: [macos-latest, windows-latest]
@@ -33,6 +32,7 @@ jobs:
           path: '*.tar.gz'
 
   publish:
+    if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -43,6 +43,7 @@ jobs:
           cargo publish --allow-dirty --verbose
 
   release:
+    if: ${{ github.ref_type == 'tag' }}
     runs-on: ubuntu-latest
     needs: [build]
     steps:
