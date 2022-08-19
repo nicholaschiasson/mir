@@ -20,8 +20,8 @@ jobs:
         if: ${{ startsWith(matrix.platform, 'windows') }}
         run: echo 'mir.exe' > bin_name.txt
       - name: Non-Windows Binary name
-        # if: ${{ !startsWith(matrix.platform, 'windows') }}
-        run: echo "mir${{ if [[ startsWith(matrix.platform, 'windows') == true ]]; then echo '.exe'; fi }}" > bin_name.txt
+        if: ${{ !startsWith(matrix.platform, 'windows') }}
+        run: echo 'mir' > bin_name.txt
       - name: Build
         run: |
           cargo build --release --verbose
