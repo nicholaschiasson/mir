@@ -33,6 +33,8 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     needs: [build]
+    outputs:
+      version: ${{ steps.stamp.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -47,20 +49,94 @@ jobs:
             echo ::set-output name=semver::minor
           fi
       - name: Bump major version and push tag
+        id: bump-major
         if: ${{ steps.check-semver.outputs.semver == 'major' }}
         uses: anothrNick/github-tag-action@1.39.0
         env:
           DEFAULT_BUMP: major
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Bump minor version and push tag
+        id: bump-minor
         if: ${{ steps.check-semver.outputs.semver == 'minor' }}
         uses: anothrNick/github-tag-action@1.39.0
         env:
           DEFAULT_BUMP: minor
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Bump patch version and push tag
+        id: bump-patch
         if: ${{ steps.check-semver.outputs.semver == 'patch' }}
         uses: anothrNick/github-tag-action@1.39.0
         env:
           DEFAULT_BUMP: patch
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Stamp version
+        id: stamp
+        run: |
+          if [[ "${{ steps.check-semver.outputs.semver }}" == patch ]]
+            VERSION=${{ steps.bump-patch.outputs.new_tag }}
+          elif [[ "${{ steps.check-semver.outputs.semver }}" == major ]]
+            VERSION=${{ steps.bump-major.outputs.new_tag }}
+          else
+            VERSION=${{ steps.bump-minor.outputs.new_tag }}
+          fi
+          echo ::set-output name=version::${VERSION}
+          sed -i "s/version = \"0.0.0\"/version = \"${VERSION}\"/" Cargo.toml
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: 'Cargo.toml'
+          path: 'Cargo.toml'
+
+  build-release:
+    strategy:
+      matrix:
+        platform: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    needs: [tag]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: 'Cargo.toml'
+      - name: Build Release
+        shell: bash
+        run: |
+          BINARY_NAME=mir
+          if [[ ${{ startsWith(matrix.platform, 'windows') }} == true ]]
+          then
+            BINARY_NAME=${BINARY_NAME}.exe
+          fi
+          cargo build --release --verbose
+          cp target/release/${BINARY_NAME} ./
+          tar czf mir-${{ runner.os }}-${{ runner.arch }}.tar.gz ${BINARY_NAME}
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          path: '*.tar.gz'
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [tag]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: 'Cargo.toml'
+      - name: Publish to crates.io
+        run: |
+          cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
+          cargo publish --allow-dirty --verbose
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-release]
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3.0.0
+      - name: Release
+        uses: softprops/action-gh-release@v0.1.14
+        with:
+          files: 'artifact/*.tar.gz'
+          tag_name: needs.build-release.outputs.version
