@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
-      - 'latest'
 
 env:
   CARGO_TERM_COLOR: always
@@ -40,8 +39,8 @@ jobs:
       - name: Publish to crates.io
         run: |
           sed -i "s/version = \"0.0.0\"/version = \"${{ github.ref_name }}\"/" Cargo.toml
-  #        cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
-  #        cargo publish --allow-dirty --verbose
+          cargo login ${{ secrets.CRATES_IO_API_TOKEN }}
+          cargo publish --allow-dirty --verbose
 
   release:
     runs-on: ubuntu-latest
