@@ -19,6 +19,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
+          pwd
           BINARY_NAME=mir
           if [[ ${{ startsWith(matrix.platform, 'windows') }} == true ]]
           then
