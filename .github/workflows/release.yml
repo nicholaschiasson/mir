@@ -19,20 +19,18 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          echo "test" > mir-${{ runner.os }}-${{ runner.arch }}.tar.gz
-        #   BINARY_NAME=mir
-        #   if [[ ${{ startsWith(matrix.platform, 'windows') }} == true ]]
-        #   then
-        #     BINARY_NAME=${BINARY_NAME}.exe
-        #   fi
-        #   echo ${BINARY_NAME}
-        #   cargo build --release --verbose
-        #   cp target/release/${BINARY_NAME} ./
-        #   tar czf mir-${{ runner.os }}-${{ runner.arch }}.tar.gz ${BINARY_NAME}
+          BINARY_NAME=mir
+          if [[ ${{ startsWith(matrix.platform, 'windows') }} == true ]]
+          then
+            BINARY_NAME=${BINARY_NAME}.exe
+          fi
+          echo ${BINARY_NAME}
+          cargo build --release --verbose
+          cp target/release/${BINARY_NAME} ./
+          tar czf mir-${{ runner.os }}-${{ runner.arch }}.tar.gz ${BINARY_NAME}
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
-          # name: mir-${{ runner.os }}-${{ runner.arch }}.tar.gz
           path: '*.tar.gz'
 
   publish:
