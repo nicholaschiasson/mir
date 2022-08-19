@@ -19,7 +19,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          pwd
+          echo "test" > mir-${{ runner.os }}-${{ runner.arch }}.tar.gz
         #   BINARY_NAME=mir
         #   if [[ ${{ startsWith(matrix.platform, 'windows') }} == true ]]
         #   then
@@ -51,6 +51,9 @@ jobs:
     steps:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3.0.0
+      - name: DEBUG
+        run: find .
+        shell: bash
       - name: Release
         uses: softprops/action-gh-release@v0.1.14
         with:
