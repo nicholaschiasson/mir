@@ -18,8 +18,8 @@ maintenance = { status = "passively-maintained" }
 [dependencies]
 clap = { version = "3.0", features = ["derive"] }
 dirs = "4.0"
-git2 = "0.14"
+git2 = "0.15"
 gitlab = "0.1500"
-indicatif = "0.16"
-rpassword = "6.0"
+indicatif = "0.17"
+rpassword = "7.0"
 serde = "1.0"

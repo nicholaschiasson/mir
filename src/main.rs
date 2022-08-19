@@ -97,7 +97,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		let progress_bar = ProgressBar::new(0);
 		progress_bar.set_style(
 			ProgressStyle::default_bar()
-				.template("[{elapsed_precise}] {msg:18}: {bar:40.magenta/red} {pos}/{len}")
+				.template("[{elapsed_precise}] {msg:18}: {bar:40.magenta/red} {pos}/{len}")?
 				.progress_chars("##-"),
 		);
 		let mut remote_callbacks = RemoteCallbacks::new();
